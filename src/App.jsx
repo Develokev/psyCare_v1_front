@@ -1,13 +1,16 @@
-import './App.css'
 
-function App() {
+
+export function App() {
   
-
   return (
     <>
-      {/* app component */}
+      <main>
+        
+      </main>
+
+      <footer>
+        
+      </footer>
     </>
   )
 }
-
-export default App
