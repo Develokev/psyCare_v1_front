@@ -1,3 +1,4 @@
+import {Routes, Route, Navigate} from 'react-router-dom'
 import { HomePage } from '../Home/Pages/HomePage'
 
 export const AppRouters = () => {
