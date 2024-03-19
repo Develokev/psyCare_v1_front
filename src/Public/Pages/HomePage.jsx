@@ -1,15 +1,13 @@
 
 export const HomePage = () => {
-
   return (
-
     <>
     <header>
-        Esto es Header
+        Esto es Header NEW
     </header>
 
     <body>
-        Esto es body
+        Esto es body NEW
     </body>
 
     </>
