@@ -1,5 +1,5 @@
 import {Routes, Route, Navigate} from 'react-router-dom'
-import { HomePage } from '../Home/Pages/HomePage'
+import { HomePage } from '../Public/Pages/HomePage'
 
 export const AppRouters = () => {
 
@@ -8,9 +8,9 @@ export const AppRouters = () => {
     <>
     <Routes>
 
-        <Route path='home' element={<HomePage />} />
+        <Route path='/' element={<HomePage />} />
 
-        <Route path='/*' element={<Navigate to={'home'} />} />
+        <Route path='/*' element={<Navigate to={'/'} />} />
 
     </Routes>
     </>
