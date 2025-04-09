@@ -1,5 +1,5 @@
 import {Routes, Route, Navigate} from 'react-router-dom'
-import { HomePage } from '../Public/Pages/HomePage'
+import { HomePage } from '../Public/Pages/HomeUser'
 
 export const AppRouters = () => {
 
