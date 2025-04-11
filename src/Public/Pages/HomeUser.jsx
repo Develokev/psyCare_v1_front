@@ -9,7 +9,7 @@ export const HomePage = () => {
   return (
     <>
     <header>
-        Esto es Header NEW
+        Tija me va a dar tremendo besote!
     </header>
 
     <body>
