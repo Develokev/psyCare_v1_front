@@ -1,5 +1,5 @@
 //esto va a ser la Home Page sin loguearse.
-import { LoginForm } from "../Components/LoginForm";
+import { LoginForm } from "../Components/LoginForm"
 
 export const HomePage = () => {
   
@@ -8,10 +8,8 @@ export const HomePage = () => {
       <header>
           Esto es HEADER
       </header>
-  
-      <body>
+
           <LoginForm />
-      </body>
   
       </>
     )
