@@ -1,30 +1,36 @@
 // LoginForm.jsx
 import React, { useState } from "react";
+import { useForm } from "../../Hooks/useForm";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const {
+    form,
+    handleChange
+  } = useForm({});
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Aquí puedes conectar con tu backend
-    const data = {
-      email,
-      password,
-    };
+    // const data = {
+    //   email,
+    //   password,
+    // };
 
-    console.log("Enviando login:", data);
+    console.log("Enviando login:", form);
 
-    // Ejemplo para llamar al backend
-    // const response = await fetch("/api/login", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(data),
-    // });
+    //Ejemplo para llamar al backend
+    const response = await fetch("https://psycare-db.onrender.com/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
 
-    // const result = await response.json();
-    // console.log(result);
+    const result = await response.json();
+    console.log(result);
   };
 
   return (
@@ -40,9 +46,10 @@ export const LoginForm = () => {
           <input
             type="email"
             className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            //value={email}
+            onChange={ handleChange }
             required
+            name = "email"
           />
         </div>
 
@@ -51,9 +58,10 @@ export const LoginForm = () => {
           <input
             type="password"
             className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            //value={password}
+            onChange={handleChange}
             required
+            name= "password"
           />
         </div>
 
