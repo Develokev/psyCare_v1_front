@@ -1,12 +1,12 @@
 export const FooterBar = () => {
+
     return (
-  
       <>
       <div className="bg-gradient-to-r from-gray-100 via-[#a5d2f6] to-gray-100">
           <div className="max-w-screen-xl px-4 py-16 mx-auto sm:px-6 lg:px-8">
               <div className="grid content-center grid-cols-1 gap-8 lg:grid-cols-3">
               <div className="text-center">
-              <img src="\src\assets\core\logo_psyCare.png" className="m-auto h-8 sm:h-9" alt="PsyCare Logo" />
+              <img src="src\assets\logo_psyCare_white.png" className="m-auto h-8 sm:h-9" alt="PsyCare Logo"/>
               
                   <div className="flex mt-5 ml-10 space-x-2 text-gray-600">
   
@@ -72,14 +72,10 @@ export const FooterBar = () => {
                   </div>
               </div>
               <p className="text-center mt-8 text-xs text-gray-800">
-                      © 2023 PsyCare
+                      © 2025 PsyCare
               </p>
           </div>
       </div>
-  
-      
       </>
-  
     )
   }
-  
