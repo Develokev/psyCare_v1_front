@@ -49,7 +49,7 @@ export const HomePage = () => {
        registerForm && <RegisterForm/>
       }
       <footer>
-        <FooterBar/>
+        {/* <FooterBar/> */}
       </footer>
       </>
     )
