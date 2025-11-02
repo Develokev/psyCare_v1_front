@@ -1,4 +1,5 @@
 //esto va a ser la Home Page sin loguearse.
+import { FooterBar } from "../Components/Footer"
 import { LoginForm } from "../Components/LoginForm"
 import { RegisterForm } from "../Components/RegisterForm"
 import { useState } from "react"
@@ -47,6 +48,9 @@ export const HomePage = () => {
       {
        registerForm && <RegisterForm/>
       }
+      <footer>
+        {/* <FooterBar/> */}
+      </footer>
       </>
     )
   }
