@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "../../Hooks/useForm";
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess, setError, setLoading } from "../../store/slices/authSlice";
+import { setUserData } from "../../store/slices/userSlice";
 
 export const RegisterForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector(state => state.auth);
+  
   const {
     form,
     handleChange
@@ -12,24 +17,76 @@ export const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(setLoading(true));
+    dispatch(setError(null));
 
-    // Aquí puedes conectar con tu backend
-    // const data = {
-    //   email,
-    //   password,
-    // };
+    try {
+      console.info('📝 Iniciando registro de usuario...');
+      
+      const response = await fetch("https://psycare-db.onrender.com/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    console.log("Sending register form:", form);
+      const result = await response.json();
 
-    //Ejemplo para llamar al backend
-    const response = await fetch("https://psycare-db.onrender.com/admin/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+      if (!response.ok) {
+        const errorMessage = result.msg || result.message || 'Error en el proceso de registro';
+        throw new Error(errorMessage);
+      }
 
-    const result = await response.json();
-    console.log(result);
+      // Si el registro es exitoso, procedemos con el login automático
+      const loginResponse = await fetch("https://psycare-db.onrender.com/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password
+        }),
+      });
+
+      const loginResult = await loginResponse.json();
+
+      if (!loginResponse.ok) {
+        throw new Error('Registro exitoso pero hubo un problema con el login automático');
+      }
+
+      // Decodificar el JWT para obtener la información del usuario
+      const tokenData = JSON.parse(atob(loginResult.token.split('.')[1]));
+
+      // Guardamos en Redux
+      dispatch(loginSuccess({
+        token: loginResult.token,
+        role: tokenData.role
+      }));
+      
+      dispatch(setUserData({
+        name: tokenData.name,
+        role: tokenData.role
+      }));
+
+      console.info('✅ Registro y login exitosos:', tokenData.name);
+      
+      // Redirigimos según el rol (por defecto será 'patient')
+      navigate('/user');
+    } catch (error) {
+      // Manejo estructurado de errores
+      let errorMessage = 'Error en el proceso de registro';
+      
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Error de conexión con el servidor';
+      } else if (error.message.includes('already exists')) {
+        errorMessage = 'El email ya está registrado';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      dispatch(setError(errorMessage));
+      console.error('❌ Error:', errorMessage);
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
 
   return (
@@ -88,11 +145,16 @@ export const RegisterForm = () => {
           />
         </div>
 
+        {error && (
+          <div className="text-red-500 text-sm mb-4">{error}</div>
+        )}
+
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition disabled:bg-blue-400"
         >
-          Regístrate
+          {loading ? 'Registrando...' : 'Regístrate'}
         </button>
       </form>
     </div>
