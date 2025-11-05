@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "../../Hooks/useForm";
+import { useDispatch, useSelector } from "react-redux";
+import { loginSuccess, setError, setLoading } from "../../store/slices/authSlice";
+import { setUserData } from "../../store/slices/userSlice";
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector(state => state.auth);
+  
   const {
     form,
     handleChange
@@ -12,24 +17,63 @@ export const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(setLoading(true));
+    dispatch(setError(null));
 
-    // Aquí puedes conectar con tu backend
-    // const data = {
-    //   email,
-    //   password,
-    // };
+    try {
+      // Desarrollo: Indica que se está intentando el login
+      console.info('🔒 Iniciando Login..');
+      
+      const response = await fetch("https://psycare-db.onrender.com/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    console.log("Enviando login:", form);
+      const result = await response.json();
+      
+      if (!response.ok) {
+        // Manejo específico de errores del backend
+        const errorMessage = result.msg || result.message || 'Error en Login process';
+        throw new Error(errorMessage);
+      }
 
-    //Ejemplo para llamar al backend
-    const response = await fetch("https://psycare-db.onrender.com/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+      // Decodificar el JWT para obtener el rol
+      const tokenData = JSON.parse(atob(result.token.split('.')[1]));
 
-    const result = await response.json();
-    console.log(result);
+      // Guardamos en Redux
+      dispatch(loginSuccess({
+        token: result.token,
+        role: tokenData.role
+      }));
+      
+      dispatch(setUserData({
+        name: tokenData.name,
+        role: tokenData.role
+      }));
+      
+      // Desarrollo: Confirma login exitoso
+      console.info('✅ Login exitoso:', tokenData.name);
+      
+      // Redirigimos según el rol
+      navigate(tokenData.role === 'admin' ? '/admin' : '/user');
+    } catch (error) {
+      // Manejo estructurado de errores
+      let errorMessage = 'Error en Login process';
+      
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage = 'Error de conexión con el servidor';
+      } else if (error.message.includes('Credenciales incorrectas')) {
+        errorMessage = 'Email o contraseña incorrectos';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      dispatch(setError(errorMessage));
+      console.error('❌ Error:', errorMessage);
+    } finally {
+      dispatch(setLoading(false));
+    }
   };
 
   return (
@@ -64,11 +108,16 @@ export const LoginForm = () => {
           />
         </div>
 
+        {error && (
+          <div className="text-red-500 text-sm mb-4">{error}</div>
+        )}
+
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition disabled:bg-blue-400"
         >
-          Iniciar Sesión
+          {loading ? 'Cargando...' : 'Iniciar Sesión'}
         </button>
       </form>
     </div>
