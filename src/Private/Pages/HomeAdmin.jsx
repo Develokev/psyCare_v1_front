@@ -59,6 +59,12 @@ export const HomeAdmin = () => {
   const hasActiveFilters = filters.status !== 'all' || filters.type !== 'all' || filters.date;
   const appointmentsToShow = hasActiveFilters ? filteredAppointments : appointments;
 
+  // Handler para cuando se hace click en un paciente
+  const handlePatientClick = (appointment) => {
+    console.log('Click en paciente:', appointment);
+    // TODO: Implementar navegación a ficha de paciente
+  };
+
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -79,6 +85,7 @@ export const HomeAdmin = () => {
             appointments={appointmentsToShow}
             loading={loading}
             error={error}
+            onPatientClick={handlePatientClick}
           />
         </div>
       </div>
