@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppointmentList } from '../Components/Appointments/AppointmentList';
+import { AppointmentFilters } from '../Components/Appointments/AppointmentFilters';
 import { 
   setAppointments, 
   setLoading, 
@@ -20,6 +21,7 @@ export const HomeAdmin = () => {
   } = useSelector(state => state.appointments);
   const { token } = useSelector(state => state.auth);
 
+  // Efecto para cargar las citas una sola vez al montar el componente
   useEffect(() => {
     const fetchAppointments = async () => {
       dispatch(setLoading(true));
@@ -42,11 +44,6 @@ export const HomeAdmin = () => {
 
         const appointments = data.data || [];
         dispatch(setAppointments(appointments));
-        
-        // Aplicar filtros iniciales si existen
-        if (filters.status !== 'all' || filters.date || filters.type !== 'all') {
-          dispatch(filterAppointments(filters));
-        }
 
       } catch (err) {
         console.error('❌ Error:', err.message);
@@ -55,12 +52,12 @@ export const HomeAdmin = () => {
     };
 
     fetchAppointments();
-  }, [dispatch, token, filters]);
+  }, [dispatch, token]); // Solo se ejecuta una vez al montar o cuando cambia el token
 
   // Determinar qué lista de citas mostrar
-  const appointmentsToShow = filteredAppointments.length > 0 
-    ? filteredAppointments 
-    : appointments;
+  // Si hay filtros activos, mostrar filteredAppointments, sino appointments
+  const hasActiveFilters = filters.status !== 'all' || filters.type !== 'all' || filters.date;
+  const appointmentsToShow = hasActiveFilters ? filteredAppointments : appointments;
 
   return (
     <div className="p-8">
@@ -75,12 +72,15 @@ export const HomeAdmin = () => {
       </div>
 
       {/* Sección de Citas */}
-      <div className="bg-white rounded-lg shadow">
-        <AppointmentList 
-          appointments={appointmentsToShow}
-          loading={loading}
-          error={error}
-        />
+      <div className="space-y-4">
+        <AppointmentFilters />
+        <div className="bg-white rounded-lg shadow">
+          <AppointmentList 
+            appointments={appointmentsToShow}
+            loading={loading}
+            error={error}
+          />
+        </div>
       </div>
     </div>
   );
