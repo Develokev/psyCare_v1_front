@@ -1,74 +1,138 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { 
+  CalendarIcon, 
+  ClockIcon, 
+  VideoCameraIcon,
+  UserGroupIcon,
+  EnvelopeIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon,
+  XCircleIcon,
+  CurrencyDollarIcon
+} from '@heroicons/react/24/outline';
 
 /**
  * Componente presentacional para mostrar la lista de citas
  * Recibe los datos y estados como props del contenedor
  */
-export const AppointmentList = ({ appointments, loading, error }) => {
+export const AppointmentList = ({ appointments, loading, error, onPatientClick }) => {
   if (loading) return (
     <div className="flex justify-center items-center p-8">
-      <p className="text-gray-600">Cargando citas...</p>
+      <span className="loading loading-spinner loading-lg"></span>
+      <p className="text-gray-600 ml-4">Cargando citas...</p>
     </div>
   );
 
   if (error) return (
-    <div className="p-4 bg-red-100 text-red-700 rounded">
-      Error: {error}
+    <div className="alert alert-error">
+      <XCircleIcon className="h-6 w-6" />
+      <span>Error: {error}</span>
     </div>
   );
 
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      confirmed: { 
+        class: 'badge-success', 
+        icon: CheckCircleIcon, 
+        text: 'Confirmada' 
+      },
+      pending: { 
+        class: 'badge-warning', 
+        icon: ExclamationCircleIcon, 
+        text: 'Pendiente' 
+      },
+      cancelled: { 
+        class: 'badge-error', 
+        icon: XCircleIcon, 
+        text: 'Cancelada' 
+      },
+      paid: { 
+        class: 'badge-info', 
+        icon: CurrencyDollarIcon, 
+        text: 'Pagada' 
+      }
+    };
+
+    const config = statusConfig[status] || { 
+      class: 'badge-ghost', 
+      icon: ExclamationCircleIcon, 
+      text: status 
+    };
+    const Icon = config.icon;
+
+    return (
+      <div className={`badge ${config.class} badge-sm gap-1`}>
+        <Icon style={{ width: '15px', height: '15px' }} />
+        <span className="text-xs">{config.text}</span>
+      </div>
+    );
+  };
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Lista de Citas</h2>
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold">Lista de Citas</h2>
+        <div className="badge badge-neutral badge-lg">{appointments.length} citas</div>
+      </div>
       
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border rounded-lg">
+        <table className="table table-zebra table-sm">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 text-left">ID Cita</th>
-              <th className="px-4 py-2 text-left">Fecha</th>
-              <th className="px-4 py-2 text-left">Hora</th>
-              <th className="px-4 py-2 text-left">Tipo</th>
-              <th className="px-4 py-2 text-left">Paciente</th>
-              <th className="px-4 py-2 text-left">Email</th>
-              <th className="px-4 py-2 text-left">Estado</th>
+            <tr>
+              <th className="w-16">ID</th>
+              <th className="w-40">Fecha y Hora</th>
+              <th className="w-32">Tipo</th>
+              <th className="w-48">Paciente</th>
+              <th className="w-56">Contacto</th>
+              <th className="w-32">Estado</th>
             </tr>
           </thead>
           <tbody>
             {appointments.map(appointment => (
-              <tr 
-                key={appointment.appo_id}
-                className="border-t hover:bg-gray-50"
-              >
-                <td className="px-4 py-2">{appointment.appo_id}</td>
-                <td className="px-4 py-2">{appointment.appodate}</td>
-                <td className="px-4 py-2">{appointment.appotime}</td>
-                <td className="px-4 py-2">
-                  {appointment.appotype === 'face-to-face' ? 'Presencial' : 'Online'}
+              <tr key={appointment.appo_id} className="hover">
+                <td className="font-mono text-xs">{appointment.appo_id}</td>
+                <td>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
+                      <CalendarIcon style={{ width: '14px', height: '14px' }} className="text-gray-400" />
+                      <span className="text-sm font-medium">{appointment.appodate}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <ClockIcon style={{ width: '14px', height: '14px' }} className="text-gray-400" />
+                      <span className="text-xs text-gray-500">{appointment.appotime}</span>
+                    </div>
+                  </div>
                 </td>
-                <td className="px-4 py-2 font-medium">
-                  {`${appointment.name || ''} ${appointment.last_name || ''}`}
+                <td>
+                  <div className="flex items-center gap-1.5">
+                    {appointment.appotype === 'face-to-face' ? (
+                      <>
+                        <UserGroupIcon style={{ width: '16px', height: '16px' }} className="text-blue-500" />
+                        <span className="text-sm">Presencial</span>
+                      </>
+                    ) : (
+                      <>
+                        <VideoCameraIcon style={{ width: '16px', height: '16px' }} className="text-green-500" />
+                        <span className="text-sm">Online</span>
+                      </>
+                    )}
+                  </div>
                 </td>
-                <td className="px-4 py-2">
+                <td>
+                  <button 
+                    className="link link-primary text-sm font-medium hover:link-hover"
+                    onClick={() => onPatientClick && onPatientClick(appointment)}
+                  >
+                    {`${appointment.name || ''} ${appointment.last_name || ''}`}
+                  </button>
+                </td>
+                <td className="text-sm text-gray-600">
                   {appointment.email || 'N/A'}
                 </td>
-                <td className="px-4 py-2">
-                  <span 
-                    className={`px-2 py-1 rounded text-sm ${
-                      appointment.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                      appointment.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      appointment.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                      appointment.status === 'paid' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}
-                  >
-                    {appointment.status === 'confirmed' ? 'Confirmada' :
-                     appointment.status === 'pending' ? 'Pendiente' :
-                     appointment.status === 'cancelled' ? 'Cancelada' :
-                     appointment.status === 'paid' ? 'Pagada' :
-                     appointment.status}
-                  </span>
+                <td>
+                  {getStatusBadge(appointment.status)}
                 </td>
               </tr>
             ))}
@@ -77,9 +141,10 @@ export const AppointmentList = ({ appointments, loading, error }) => {
       </div>
 
       {appointments.length === 0 && (
-        <p className="text-center text-gray-500 mt-4">
-          No se encontraron citas
-        </p>
+        <div className="text-center py-8">
+          <ExclamationCircleIcon className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+          <p className="text-gray-500">No se encontraron citas</p>
+        </div>
       )}
     </div>
   );
@@ -100,4 +165,5 @@ AppointmentList.propTypes = {
   ).isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.string,
+  onPatientClick: PropTypes.func,
 };
