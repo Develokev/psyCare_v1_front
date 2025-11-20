@@ -70,7 +70,7 @@ export const PatientStats = ({ patient, appointments }) => {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="text-xl font-semibold mb-4 text-gray-800">
-        Estadísticas
+        Stats
       </h3>
 
       {/* Grid de estadísticas */}
