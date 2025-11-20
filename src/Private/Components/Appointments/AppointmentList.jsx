@@ -82,7 +82,8 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
           <thead>
             <tr>
               <th className="w-16">ID</th>
-              <th className="w-40">Fecha y Hora</th>
+              <th className="w-32">Fecha</th>
+              <th className="w-24">Hora</th>
               <th className="w-32">Tipo</th>
               <th className="w-48">Paciente</th>
               <th className="w-56">Contacto</th>
@@ -94,15 +95,15 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
               <tr key={appointment.appo_id} className="hover">
                 <td className="font-mono text-xs">{appointment.appo_id}</td>
                 <td>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-1">
-                      <CalendarIcon style={{ width: '14px', height: '14px' }} className="text-gray-400" />
-                      <span className="text-sm font-medium">{appointment.appodate}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <ClockIcon style={{ width: '14px', height: '14px' }} className="text-gray-400" />
-                      <span className="text-xs text-gray-500">{appointment.appotime}</span>
-                    </div>
+                  <div className="flex items-center gap-1">
+                    <CalendarIcon style={{ width: '14px', height: '14px' }} className="text-gray-400" />
+                    <span className="text-sm font-medium">{appointment.appodate}</span>
+                  </div>
+                </td>
+                <td>
+                  <div className="flex items-center gap-1">
+                    <ClockIcon style={{ width: '14px', height: '14px' }} className="text-gray-400" />
+                    <span className="text-sm text-gray-500">{appointment.appotime}</span>
                   </div>
                 </td>
                 <td>
@@ -122,7 +123,7 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
                 </td>
                 <td>
                   <button 
-                    className="link link-primary text-sm font-medium hover:link-hover"
+                    className="btn btn-sm btn-primary btn-outline normal-case px-4 py-2"
                     onClick={() => onPatientClick && onPatientClick(appointment)}
                   >
                     {`${appointment.name || ''} ${appointment.last_name || ''}`}

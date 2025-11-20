@@ -14,6 +14,8 @@ const PrivateRoute = ({ children, allowedRole }) => {
   }
   
   if (allowedRole && userRole !== allowedRole) {
+
+    console.log('Redirigiendo por rol:', userRole);
     // Si el rol no coincide, redirige a la página correspondiente a su rol
     return <Navigate to={userRole === 'admin' ? '/admin' : '/user'} />;
   }
