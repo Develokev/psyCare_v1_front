@@ -1,22 +1,35 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { 
   CalendarIcon, 
   ClockIcon, 
   VideoCameraIcon,
   UserGroupIcon,
-  EnvelopeIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
   XCircleIcon,
-  CurrencyDollarIcon
+  CurrencyDollarIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline';
+import { AppointmentModal } from './AppointmentModal';
 
 /**
  * Componente presentacional para mostrar la lista de citas
  * Recibe los datos y estados como props del contenedor
  */
 export const AppointmentList = ({ appointments, loading, error, onPatientClick }) => {
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEditClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAppointment(null);
+  };
   if (loading) return (
     <div className="flex justify-center items-center p-8">
       <span className="loading loading-spinner loading-lg"></span>
@@ -73,7 +86,7 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">Lista de Citas</h2>
+        <h2 className="text-2xl font-bold">Todas las Citas</h2>
         <div className="badge badge-neutral badge-lg">{appointments.length} citas</div>
       </div>
       
@@ -88,6 +101,7 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
               <th className="w-48">Paciente</th>
               <th className="w-56">Contacto</th>
               <th className="w-32">Estado</th>
+              <th className="w-24">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -135,6 +149,16 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
                 <td>
                   {getStatusBadge(appointment.status)}
                 </td>
+                <td>
+                  <button
+                    onClick={() => handleEditClick(appointment)}
+                    className="btn btn-ghost btn-xs gap-1 hover:bg-blue-50 hover:text-blue-600"
+                    title="Editar cita"
+                  >
+                    <PencilSquareIcon className="w-4 h-4" />
+                    Editar
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -147,6 +171,13 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
           <p className="text-gray-500">No se encontraron citas</p>
         </div>
       )}
+
+      {/* Modal de edición */}
+      <AppointmentModal
+        isOpen={isModalOpen}
+        appointment={selectedAppointment}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

@@ -93,6 +93,30 @@ export const appointmentSlice = createSlice({
     },
 
     /**
+     * Elimina una cita del estado
+     * @param {Object} state - Estado actual
+     * @param {Object} action - Action con el appoId a eliminar
+     */
+    deleteAppointment: (state, action) => {
+      const appoId = action.payload;
+
+      // Eliminar de appointments
+      state.appointments = state.appointments.filter(
+        (app) => app.appo_id !== appoId
+      );
+
+      // Eliminar de filteredAppointments si existe
+      state.filteredAppointments = state.filteredAppointments.filter(
+        (app) => app.appo_id !== appoId
+      );
+
+      // Limpiar selectedAppointment si es la cita eliminada
+      if (state.selectedAppointment?.appo_id === appoId) {
+        state.selectedAppointment = null;
+      }
+    },
+
+    /**
      * Aplica filtros a la lista de citas
      * @param {Object} state - Estado actual
      * @param {Object} action - Action con { status, date, type }
@@ -146,6 +170,7 @@ export const {
   setSelectedAppointment,
   updateAppointmentStatus,
   addAppointment,
+  deleteAppointment,
   filterAppointments,
   setLoading,
   setError,

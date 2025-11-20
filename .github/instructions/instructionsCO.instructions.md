@@ -5,6 +5,7 @@ applyTo: '**'
 -Utiliza el framework React para crear esta aplicación web.
 -Las instalaciones debemos hacerlas con "yarn" siempre.
 -Utiliza componentes funcionales y hooks de React.
+-No utilices el "import React from 'react'" de no ser necesario. (no necesario desde React 17+)
 -Haz uso de buenas prácticas.
 -Refactoriza el código siempre que se pueda, pero pregúntame antes de hacerlo siempre.
 -Crea tests de las funcionabilidades principales.
