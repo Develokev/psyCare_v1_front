@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { XMarkIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { AppointmentPreview } from './AppointmentPreview';
 import { StatusSelector } from './StatusSelector';
+import { AppointmentEditForm } from './AppointmentEditForm';
 import { ConfirmDialog } from './ConfirmDialog';
-import { updateAppointmentStatus, deleteAppointment } from '../../../store/slices/appointmentSlice';
+import { updateAppointmentStatus, updateAppointmentData, deleteAppointment } from '../../../store/slices/appointmentSlice';
 
 /**
  * Modal principal para editar citas
@@ -17,8 +18,11 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
   const { token } = useSelector(state => state.auth);
   
   // Estados locales
+  const [activeTab, setActiveTab] = useState('status'); // 'status' o 'data'
   const [newStatus, setNewStatus] = useState(null);
+  const [newData, setNewData] = useState(null);
   const [showStatusConfirm, setShowStatusConfirm] = useState(false);
+  const [showDataConfirm, setShowDataConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -70,15 +74,67 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
         status: newStatus 
       }));
 
-      // TODO: Aquí se enviará la notificación al usuario (futuro)
-      console.log('📧 TODO: Enviar notificación de cambio de estado al usuario');
-
       // Cerrar diálogos y modal
       setShowStatusConfirm(false);
       onClose();
       
     } catch (error) {
       console.error('Error al cambiar estado:', error.message);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handler para guardar cambios de datos
+  const handleSaveData = (formData) => {
+    setNewData(formData);
+    setShowDataConfirm(true);
+  };
+
+  // Confirmar guardado de datos
+  const handleConfirmDataChange = async () => {
+    setIsLoading(true);
+    try {
+      const requestBody = {
+        appoDate: newData.appodate,
+        appoTime: newData.appotime,
+        appoType: newData.appotype,
+      };
+
+      // Llamada a la API para actualizar los datos de la cita
+      const response = await fetch(
+        `https://psycare-db.onrender.com/admin/appo/${appointment.appo_id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || 'Error al actualizar la cita');
+      }
+
+      // Actualizar Redux
+      dispatch(updateAppointmentData({ 
+        appoId: appointment.appo_id,
+        appodate: newData.appodate,
+        appotime: newData.appotime,
+        appotype: newData.appotype,
+      }));
+
+      // Cerrar diálogos y modal
+      setShowDataConfirm(false);
+      onClose();
+      
+    } catch (error) {
+      console.error('Error al actualizar datos:', error.message);
       alert(`Error: ${error.message}`);
     } finally {
       setIsLoading(false);
@@ -159,12 +215,55 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
             {/* Divisor */}
             <div className="border-t border-gray-200"></div>
 
-            {/* Selector de estado */}
-            <StatusSelector
-              currentStatus={appointment.status}
-              onStatusChange={handleStatusChange}
-              disabled={isLoading}
-            />
+            {/* Tabs */}
+            <div className="flex border-b border-gray-200">
+              <button
+                onClick={() => setActiveTab('status')}
+                disabled={isLoading}
+                className={`
+                  flex-1 px-4 py-2 text-sm font-medium transition-colors
+                  ${activeTab === 'status'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                  }
+                  ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                Cambiar Estado
+              </button>
+              <button
+                onClick={() => setActiveTab('data')}
+                disabled={isLoading}
+                className={`
+                  flex-1 px-4 py-2 text-sm font-medium transition-colors
+                  ${activeTab === 'data'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-500 hover:text-gray-700'
+                  }
+                  ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                Editar Datos
+              </button>
+            </div>
+
+            {/* Contenido según tab activo */}
+            <div className="min-h-[200px]">
+              {activeTab === 'status' ? (
+                <StatusSelector
+                  currentStatus={appointment.status}
+                  onStatusChange={handleStatusChange}
+                  disabled={isLoading}
+                />
+              ) : (
+                <AppointmentEditForm
+                  appointment={appointment}
+                  onSave={handleSaveData}
+                  onCancel={onClose}
+                  isLoading={isLoading}
+                />
+              )}
+            </div>
 
             {/* Divisor */}
             <div className="border-t border-gray-200"></div>
@@ -180,7 +279,7 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={isLoading}
-                className="btn btn-error btn-sm gap-2"
+                className="btn btn-outline btn-error hover:btn-error transition-all shadow-md hover:shadow-lg gap-2"
               >
                 <TrashIcon className="w-4 h-4" />
                 Eliminar cita
@@ -211,6 +310,54 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
             📧 Se enviará una notificación al paciente
           </p>
         </div>
+      </ConfirmDialog>
+
+      {/* Diálogo de confirmación de cambio de datos */}
+      <ConfirmDialog
+        isOpen={showDataConfirm}
+        onClose={() => setShowDataConfirm(false)}
+        onConfirm={handleConfirmDataChange}
+        title="Confirmar cambios"
+        message="¿Confirmar los cambios en los datos de la cita?"
+        confirmText={isLoading ? 'Guardando...' : 'Guardar cambios'}
+        type="warning"
+      >
+        {newData && (
+          <div className="bg-blue-50 rounded p-3 text-sm space-y-2">
+            <p className="font-medium text-gray-700">
+              Paciente: {appointment.name} {appointment.last_name}
+            </p>
+            <div className="grid grid-cols-2 gap-2 text-gray-600">
+              <div>
+                <p className="text-xs text-gray-500">Fecha actual:</p>
+                <p className="font-medium">{appointment.appodate}</p>
+              </div>
+              <div>
+                <p className="text-xs text-blue-600">Nueva fecha:</p>
+                <p className="font-semibold text-blue-700">{newData.appodate}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Hora actual:</p>
+                <p className="font-medium">{appointment.appotime}</p>
+              </div>
+              <div>
+                <p className="text-xs text-blue-600">Nueva hora:</p>
+                <p className="font-semibold text-blue-700">{newData.appotime}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Tipo actual:</p>
+                <p className="font-medium capitalize">{appointment.appotype}</p>
+              </div>
+              <div>
+                <p className="text-xs text-blue-600">Nuevo tipo:</p>
+                <p className="font-semibold text-blue-700 capitalize">{newData.appotype}</p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              📧 Se enviará una notificación al paciente
+            </p>
+          </div>
+        )}
       </ConfirmDialog>
 
       {/* Diálogo de confirmación de eliminación */}

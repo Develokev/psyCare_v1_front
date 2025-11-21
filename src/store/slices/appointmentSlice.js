@@ -70,6 +70,32 @@ export const appointmentSlice = createSlice({
     },
 
     /**
+     * Actualiza los datos completos de una cita (fecha, hora, tipo)
+     * @param {Object} state - Estado actual
+     * @param {Object} action - Action con { appoId, appodate, appotime, appotype }
+     */
+    updateAppointmentData: (state, action) => {
+      const { appoId, appodate, appotime, appotype } = action.payload;
+      const appointment = state.appointments.find(
+        (app) => app.appo_id === appoId
+      );
+      if (appointment) {
+        appointment.appodate = appodate;
+        appointment.appotime = appotime;
+        appointment.appotype = appotype;
+        // Actualizar también en filteredAppointments si existe
+        const filteredAppointment = state.filteredAppointments.find(
+          (app) => app.appo_id === appoId
+        );
+        if (filteredAppointment) {
+          filteredAppointment.appodate = appodate;
+          filteredAppointment.appotime = appotime;
+          filteredAppointment.appotype = appotype;
+        }
+      }
+    },
+
+    /**
      * Añade una nueva cita al estado
      * @param {Object} state - Estado actual
      * @param {Object} action - Action con la nueva cita
@@ -169,6 +195,7 @@ export const {
   setAppointments,
   setSelectedAppointment,
   updateAppointmentStatus,
+  updateAppointmentData,
   addAppointment,
   deleteAppointment,
   filterAppointments,
