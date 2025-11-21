@@ -52,3 +52,4 @@
 - [ ] Limpiar imports de iconos no utilizados en otros componentes
 - [ ] Revisar y limpiar console.logs de debugging
 - [ ] Sesión de refactorización general del código (imports, código duplicado, optimizaciones)
+-
