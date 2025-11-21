@@ -18,17 +18,17 @@ export const AppointmentFilters = ({ onFilterChange }) => {
   };
 
   return (
-    <div className="bg-base-100 shadow-lg rounded-lg p-6 mb-6">
-      <h3 className="text-lg font-semibold mb-4">Filtros de Búsqueda</h3>
+    <div className="bg-base-100 shadow rounded-lg p-4 mb-4">
+      <h3 className="text-sm font-semibold mb-3">Filtros de Búsqueda</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Filtro de Estado */}
         <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text">Estado de la Cita</span>
+          <label className="label py-1">
+            <span className="label-text text-xs">Estado de la Cita</span>
           </label>
           <select 
-            className="select select-bordered w-full"
+            className="select select-bordered select-sm w-full text-xs"
             value={filters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
           >
@@ -42,11 +42,11 @@ export const AppointmentFilters = ({ onFilterChange }) => {
 
         {/* Filtro de Tipo */}
         <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text">Tipo de Cita</span>
+          <label className="label py-1">
+            <span className="label-text text-xs">Tipo de Cita</span>
           </label>
           <select 
-            className="select select-bordered w-full"
+            className="select select-bordered select-sm w-full text-xs"
             value={filters.type}
             onChange={(e) => handleFilterChange('type', e.target.value)}
           >
@@ -58,18 +58,18 @@ export const AppointmentFilters = ({ onFilterChange }) => {
 
         {/* Filtro de Fecha */}
         <div className="form-control w-full">
-          <label className="label">
-            <span className="label-text">Fecha</span>
+          <label className="label py-1">
+            <span className="label-text text-xs">Fecha</span>
           </label>
           <input 
             type="date" 
-            className="input input-bordered w-full"
+            className="input input-bordered input-sm w-full text-xs"
             value={filters.date || ''}
             onChange={(e) => handleFilterChange('date', e.target.value)}
           />
           {filters.date && (
             <button 
-              className="btn btn-xs btn-ghost mt-2"
+              className="btn btn-xs btn-ghost mt-1 text-xs"
               onClick={() => handleFilterChange('date', null)}
             >
               Limpiar fecha
@@ -79,9 +79,9 @@ export const AppointmentFilters = ({ onFilterChange }) => {
       </div>
 
       {/* Badges de filtros activos */}
-      <div className="flex flex-wrap gap-2 mt-4">
+      <div className="flex flex-wrap gap-1.5 mt-3">
         {filters.status !== 'all' && (
-          <span className="badge badge-primary gap-2">
+          <span className="badge badge-primary badge-sm gap-1 text-xs">
             Estado: {filters.status === 'confirmed' ? 'Confirmada' :
                     filters.status === 'pending' ? 'Pendiente' :
                     filters.status === 'cancelled' ? 'Cancelada' :
@@ -95,7 +95,7 @@ export const AppointmentFilters = ({ onFilterChange }) => {
           </span>
         )}
         {filters.type !== 'all' && (
-          <span className="badge badge-primary gap-2">
+          <span className="badge badge-primary badge-sm gap-1 text-xs">
             Tipo: {filters.type === 'face-to-face' ? 'Presencial' : 'Online'}
             <button 
               className="btn btn-xs btn-ghost btn-circle"
@@ -106,7 +106,7 @@ export const AppointmentFilters = ({ onFilterChange }) => {
           </span>
         )}
         {filters.date && (
-          <span className="badge badge-primary gap-2">
+          <span className="badge badge-primary badge-sm gap-1 text-xs">
             Fecha: {filters.date}
             <button 
               className="btn btn-xs btn-ghost btn-circle"
@@ -121,7 +121,7 @@ export const AppointmentFilters = ({ onFilterChange }) => {
       {/* Botón para limpiar todos los filtros */}
       {(filters.status !== 'all' || filters.type !== 'all' || filters.date) && (
         <button 
-          className="btn btn-ghost btn-sm mt-4"
+          className="btn btn-ghost btn-xs mt-3 text-xs"
           onClick={() => {
             dispatch(filterAppointments({
               status: 'all',
