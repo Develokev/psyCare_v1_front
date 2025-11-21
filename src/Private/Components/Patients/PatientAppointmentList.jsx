@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   CalendarIcon,
@@ -9,13 +9,28 @@ import {
   ExclamationCircleIcon,
   XCircleIcon,
   CurrencyDollarIcon,
+  PencilSquareIcon,
 } from '@heroicons/react/24/outline';
+import { AppointmentModal } from '../Appointments/AppointmentModal';
 
 /**
  * Componente presentacional para mostrar la lista de citas de un paciente específico
  * Similar a AppointmentList pero enfocado en un solo paciente
  */
 export const PatientAppointmentList = ({ appointments, patientName }) => {
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleEditClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAppointment(null);
+  };
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       confirmed: {
@@ -80,74 +95,88 @@ export const PatientAppointmentList = ({ appointments, patientName }) => {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold">
-          Citas de {patientName}
-        </h2>
-        <div className="badge badge-neutral badge-lg">
-          {appointments.length} {appointments.length === 1 ? 'cita' : 'citas'}
+    <>
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold">
+            Citas de {patientName}
+          </h2>
+          <div className="badge badge-neutral badge-lg">
+            {appointments.length} {appointments.length === 1 ? 'cita' : 'citas'}
+          </div>
         </div>
+
+        {appointments.length === 0 ? (
+          <div className="text-center py-12">
+            <CalendarIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">
+              No hay citas registradas para este paciente
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="table table-zebra table-sm">
+              <thead>
+                <tr>
+                  <th className="w-16">ID</th>
+                  <th className="w-32">Fecha</th>
+                  <th className="w-24">Hora</th>
+                  <th className="w-32">Tipo</th>
+                  <th className="w-32">Estado</th>
+                  <th className="w-48">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedAppointments.map((appointment) => (
+                  <tr key={appointment.appo_id} className="hover">
+                    <td className="font-mono text-xs">{appointment.appo_id}</td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <CalendarIcon
+                          style={{ width: '14px', height: '14px' }}
+                          className="text-gray-400"
+                        />
+                        <span className="text-sm font-medium">
+                          {appointment.appodate}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <ClockIcon
+                          style={{ width: '14px', height: '14px' }}
+                          className="text-gray-400"
+                        />
+                        <span className="text-sm">{appointment.appotime}</span>
+                      </div>
+                    </td>
+                    <td>{getTypeBadge(appointment.appotype)}</td>
+                    <td>{getStatusBadge(appointment.status)}</td>
+                    <td>
+                      <button
+                        onClick={() => handleEditClick(appointment)}
+                        className="btn btn-ghost btn-sm gap-2"
+                        aria-label="Editar cita"
+                      >
+                        <PencilSquareIcon className="h-5 w-5" />
+                        Editar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {appointments.length === 0 ? (
-        <div className="text-center py-12">
-          <CalendarIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">
-            No hay citas registradas para este paciente
-          </p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="table table-zebra table-sm">
-            <thead>
-              <tr>
-                <th className="w-16">ID</th>
-                <th className="w-32">Fecha</th>
-                <th className="w-24">Hora</th>
-                <th className="w-32">Tipo</th>
-                <th className="w-32">Estado</th>
-                <th className="w-48">Notas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedAppointments.map((appointment) => (
-                <tr key={appointment.appo_id} className="hover">
-                  <td className="font-mono text-xs">{appointment.appo_id}</td>
-                  <td>
-                    <div className="flex items-center gap-1">
-                      <CalendarIcon
-                        style={{ width: '14px', height: '14px' }}
-                        className="text-gray-400"
-                      />
-                      <span className="text-sm font-medium">
-                        {appointment.appodate}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-1">
-                      <ClockIcon
-                        style={{ width: '14px', height: '14px' }}
-                        className="text-gray-400"
-                      />
-                      <span className="text-sm">{appointment.appotime}</span>
-                    </div>
-                  </td>
-                  <td>{getTypeBadge(appointment.appotype)}</td>
-                  <td>{getStatusBadge(appointment.status)}</td>
-                  <td>
-                    <span className="text-xs text-gray-600">
-                      {appointment.session_notes || 'Sin notas'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+      {/* Modal de edición - Reutiliza el mismo que AppointmentList */}
+      <AppointmentModal
+        isOpen={isModalOpen}
+        appointment={selectedAppointment}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 };
 

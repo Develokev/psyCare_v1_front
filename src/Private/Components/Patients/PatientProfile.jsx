@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import {
   setCurrentPatient,
   setPatientAppointments,
@@ -24,6 +25,48 @@ export const PatientProfile = ({ userId, allUsers, allAppointments, onBack }) =>
   const { currentPatient, patientAppointments, loading, error } = useSelector(
     state => state.patient
   );
+
+  const [filters, setFilters] = useState({
+    status: '',
+    type: '',
+    date: '', // Cambiado de dateFrom a date para búsqueda exacta
+  });
+
+  // Buscar datos del paciente
+  const patient = useMemo(() => {
+    return allUsers.find(user => user.user_id === userId);
+  }, [allUsers, userId]);
+
+  // Filtrar citas del paciente
+  const patientAppointmentsFiltered = useMemo(() => {
+    if (!patient?.email) return [];
+    return allAppointments.filter(app => app.email === patient.email);
+  }, [allAppointments, patient]);
+
+  // Aplicar filtros a las citas del paciente
+  const filteredAppointments = useMemo(() => {
+    let filtered = [...patientAppointmentsFiltered];
+
+    // Filtro por estado
+    if (filters.status) {
+      filtered = filtered.filter(app => app.status === filters.status);
+    }
+
+    // Filtro por tipo
+    if (filters.type) {
+      filtered = filtered.filter(app => app.appotype === filters.type);
+    }
+
+    // Filtro por fecha exacta
+    if (filters.date) {
+      // Convertir fecha del input (YYYY-MM-DD) a formato de la BD (DD-MM-YYYY)
+      const [year, month, day] = filters.date.split('-');
+      const formattedDate = `${day}-${month}-${year}`;
+      filtered = filtered.filter(app => app.appodate === formattedDate);
+    }
+
+    return filtered;
+  }, [patientAppointmentsFiltered, filters]);
 
   useEffect(() => {
     const loadPatientData = () => {
@@ -96,36 +139,104 @@ export const PatientProfile = ({ userId, allUsers, allAppointments, onBack }) =>
 
   return (
     <div className="space-y-6">
-      {/* Header con navegación y datos básicos */}
-      <PatientHeader patient={currentPatient} onBack={onBack} />
+      {/* Botón de volver */}
+      <button
+        onClick={onBack}
+        className="btn btn-ghost gap-2"
+      >
+        <ArrowLeftIcon className="w-5 h-5" />
+        Volver a todas las citas
+      </button>
 
-      {/* Grid con información del paciente */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Columna izquierda: Contacto */}
-        <div className="lg:col-span-1">
-          <PatientContactCard patient={currentPatient} />
+      {/* Header con avatar y nombre */}
+      <PatientHeader patient={patient} onBack={onBack} />
+
+      {/* Grid con información y estadísticas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PatientContactCard patient={patient} />
+        <PatientStats patient={patient} appointments={patientAppointmentsFiltered} />
+      </div>
+
+      {/* Filtros de citas - Controles independientes */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <h3 className="text-lg font-semibold mb-4">Filtrar citas</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Filtro de Estado */}
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Estado de la Cita</span>
+            </label>
+            <select 
+              className="select select-bordered w-full"
+              value={filters.status}
+              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+            >
+              <option value="">Todos los estados</option>
+              <option value="pending">Pendiente</option>
+              <option value="confirmed">Confirmada</option>
+              <option value="cancelled">Cancelada</option>
+              <option value="paid">Pagada</option>
+            </select>
+          </div>
+
+          {/* Filtro de Tipo */}
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Tipo de Cita</span>
+            </label>
+            <select 
+              className="select select-bordered w-full"
+              value={filters.type}
+              onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+            >
+              <option value="">Todos los tipos</option>
+              <option value="online">Online</option>
+              <option value="face-to-face">Presencial</option>
+            </select>
+          </div>
+
+          {/* Filtro de Fecha */}
+          <div className="form-control w-full">
+            <label className="label">
+              <span className="label-text">Fecha</span>
+            </label>
+            <input
+              type="date"
+              className="input input-bordered w-full"
+              value={filters.date}
+              onChange={(e) => setFilters(prev => ({ ...prev, date: e.target.value }))}
+            />
+          </div>
         </div>
-
-        {/* Columna derecha: Estadísticas */}
-        <div className="lg:col-span-2">
-          <PatientStats 
-            patient={currentPatient} 
-            appointments={patientAppointments} 
-          />
+        
+        {/* Indicador de resultados */}
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            Mostrando {filteredAppointments.length} de {patientAppointmentsFiltered.length} citas
+          </div>
+          {(filters.status || filters.type || filters.date) && (
+            <button
+              onClick={() => setFilters({ status: '', type: '', date: '' })}
+              className="btn btn-sm btn-ghost"
+            >
+              Limpiar filtros
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Lista de citas del paciente */}
+      {/* Lista de citas del paciente - ahora con filtros aplicados */}
       <PatientAppointmentList 
-        appointments={patientAppointments}
-        patientName={`${currentPatient.name} ${currentPatient.last_name || ''}`}
+        appointments={filteredAppointments}
+        patientName={`${patient.name} ${patient.last_name}`}
       />
     </div>
   );
 };
 
 PatientProfile.propTypes = {
-  userId: PropTypes.number.isRequired,
+  userId: PropTypes.number,
   allUsers: PropTypes.array.isRequired,
   allAppointments: PropTypes.array.isRequired,
   onBack: PropTypes.func.isRequired,

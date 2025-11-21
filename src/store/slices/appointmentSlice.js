@@ -157,7 +157,10 @@ export const appointmentSlice = createSlice({
         filtered = filtered.filter((app) => app.status === status);
       }
       if (date) {
-        filtered = filtered.filter((app) => app.appodate === date);
+        // Convertir fecha del input (YYYY-MM-DD) a formato de la base de datos (DD-MM-YYYY)
+        const [year, month, day] = date.split('-');
+        const formattedDate = `${day}-${month}-${year}`;
+        filtered = filtered.filter((app) => app.appodate === formattedDate);
       }
       if (type && type !== "all") {
         filtered = filtered.filter((app) => app.appotype === type);
