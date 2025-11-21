@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppointmentList } from '../Components/Appointments/AppointmentList';
 import { AppointmentFilters } from '../Components/Appointments/AppointmentFilters';
+import { UpcomingAppointments } from '../Components/Appointments/UpcomingAppointments';
 import { PatientProfile } from '../Components/Patients/PatientProfile';
 import { clearCurrentPatient } from '../../store/slices/patientSlice';
 import { 
@@ -133,8 +134,14 @@ export const HomeAdmin = () => {
       {/* Renderizado condicional según la vista actual */}
       {currentView === 'appointments' ? (
         /* Sección de Citas */
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Widget de próximas citas */}
+          <UpcomingAppointments appointments={appointments} />
+
+          {/* Filtros */}
           <AppointmentFilters />
+          
+          {/* Tabla principal de citas */}
           <div className="bg-white rounded-lg shadow">
             <AppointmentList 
               appointments={appointmentsToShow}

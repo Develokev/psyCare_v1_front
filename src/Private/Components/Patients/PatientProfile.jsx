@@ -159,16 +159,16 @@ export const PatientProfile = ({ userId, allUsers, allAppointments, onBack }) =>
 
       {/* Filtros de citas - Controles independientes */}
       <div className="bg-white rounded-lg shadow p-4">
-        <h3 className="text-lg font-semibold mb-4">Filtrar citas</h3>
+        <h3 className="text-sm font-semibold mb-3">Filtrar citas</h3>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Filtro de Estado */}
           <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Estado de la Cita</span>
+            <label className="label py-1">
+              <span className="label-text text-xs">Estado de la Cita</span>
             </label>
             <select 
-              className="select select-bordered w-full"
+              className="select select-bordered select-sm w-full text-xs"
               value={filters.status}
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
             >
@@ -182,11 +182,11 @@ export const PatientProfile = ({ userId, allUsers, allAppointments, onBack }) =>
 
           {/* Filtro de Tipo */}
           <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Tipo de Cita</span>
+            <label className="label py-1">
+              <span className="label-text text-xs">Tipo de Cita</span>
             </label>
             <select 
-              className="select select-bordered w-full"
+              className="select select-bordered select-sm w-full text-xs"
               value={filters.type}
               onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
             >
@@ -198,12 +198,12 @@ export const PatientProfile = ({ userId, allUsers, allAppointments, onBack }) =>
 
           {/* Filtro de Fecha */}
           <div className="form-control w-full">
-            <label className="label">
-              <span className="label-text">Fecha</span>
+            <label className="label py-1">
+              <span className="label-text text-xs">Fecha</span>
             </label>
             <input
               type="date"
-              className="input input-bordered w-full"
+              className="input input-bordered input-sm w-full text-xs"
               value={filters.date}
               onChange={(e) => setFilters(prev => ({ ...prev, date: e.target.value }))}
             />
@@ -211,14 +211,14 @@ export const PatientProfile = ({ userId, allUsers, allAppointments, onBack }) =>
         </div>
         
         {/* Indicador de resultados */}
-        <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+        <div className="mt-3 flex items-center justify-between">
+          <div className="text-xs text-gray-600">
             Mostrando {filteredAppointments.length} de {patientAppointmentsFiltered.length} citas
           </div>
           {(filters.status || filters.type || filters.date) && (
             <button
               onClick={() => setFilters({ status: '', type: '', date: '' })}
-              className="btn btn-sm btn-ghost"
+              className="btn btn-xs btn-ghost text-xs"
             >
               Limpiar filtros
             </button>

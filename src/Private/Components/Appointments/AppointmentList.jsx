@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { 
   CalendarIcon, 
@@ -20,6 +20,70 @@ import { AppointmentModal } from './AppointmentModal';
 export const AppointmentList = ({ appointments, loading, error, onPatientClick }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState('upcoming'); // 'upcoming' | 'recent'
+  const [visibleCount, setVisibleCount] = useState(20);
+
+  // Obtener fecha actual para comparaciones
+  const today = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    return now;
+  }, []);
+
+  // Ordenar y filtrar citas según el orden seleccionado
+  const sortedAppointments = useMemo(() => {
+    let filtered = [...appointments];
+
+    // Si es modo "Próximas", filtrar solo citas futuras
+    if (sortOrder === 'upcoming') {
+      filtered = filtered.filter(appo => {
+        const [day, month, year] = appo.appodate.split('-');
+        const appoDate = new Date(year, month - 1, day);
+        appoDate.setHours(0, 0, 0, 0);
+        return appoDate >= today;
+      });
+    }
+
+    // Ordenar las citas
+    const sorted = filtered.sort((a, b) => {
+      // Convertir fecha A a Date object
+      const [dayA, monthA, yearA] = a.appodate.split('-');
+      const dateA = new Date(yearA, monthA - 1, dayA);
+      
+      // Convertir fecha B a Date object
+      const [dayB, monthB, yearB] = b.appodate.split('-');
+      const dateB = new Date(yearB, monthB - 1, dayB);
+
+      // Si las fechas son diferentes
+      if (dateA.getTime() !== dateB.getTime()) {
+        // Próximas: ascendente (más cercana primero)
+        // Historial: descendente (más reciente primero)
+        return sortOrder === 'upcoming' ? dateA - dateB : dateB - dateA;
+      }
+
+      // Si es el mismo día, ordenar por hora
+      const [hoursA, minutesA] = a.appotime.split(':');
+      const timeA = parseInt(hoursA) * 60 + parseInt(minutesA);
+      
+      const [hoursB, minutesB] = b.appotime.split(':');
+      const timeB = parseInt(hoursB) * 60 + parseInt(minutesB);
+
+      return sortOrder === 'upcoming' ? timeA - timeB : timeB - timeA;
+    });
+
+    return sorted;
+  }, [appointments, sortOrder, today]);
+
+  // Limitar citas visibles (solo en modo Historial)
+  const displayedAppointments = useMemo(() => {
+    if (sortOrder === 'upcoming') {
+      return sortedAppointments; // Mostrar todas las próximas
+    }
+    return sortedAppointments.slice(0, visibleCount);
+  }, [sortedAppointments, sortOrder, visibleCount]);
+
+  const hasMoreToShow = sortOrder === 'recent' && sortedAppointments.length > visibleCount;
+  const remainingCount = sortedAppointments.length - visibleCount;
 
   const handleEditClick = (appointment) => {
     setSelectedAppointment(appointment);
@@ -87,7 +151,43 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">Todas las Citas</h2>
-        <div className="badge badge-neutral badge-lg">{appointments.length} citas</div>
+        
+        <div className="flex items-center gap-4">
+          {/* Botones de ordenamiento */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 font-medium">Ver:</span>
+            <button
+              onClick={() => {
+                setSortOrder('upcoming');
+                setVisibleCount(20);
+              }}
+              className={`btn btn-sm gap-1 ${
+                sortOrder === 'upcoming' ? 'btn-primary' : 'btn-ghost'
+              }`}
+            >
+              📅 Próximas
+            </button>
+            <button
+              onClick={() => {
+                setSortOrder('recent');
+                setVisibleCount(20);
+              }}
+              className={`btn btn-sm gap-1 ${
+                sortOrder === 'recent' ? 'btn-primary' : 'btn-ghost'
+              }`}
+            >
+              📋 Historial
+            </button>
+          </div>
+
+          {/* Badge de total */}
+          <div className="badge badge-neutral badge-lg">
+            {sortOrder === 'upcoming' 
+              ? `${sortedAppointments.length} próximas`
+              : `${displayedAppointments.length} de ${sortedAppointments.length} citas`
+            }
+          </div>
+        </div>
       </div>
       
       <div className="overflow-x-auto">
@@ -105,7 +205,7 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
             </tr>
           </thead>
           <tbody>
-            {appointments.map(appointment => (
+            {displayedAppointments.map(appointment => (
               <tr key={appointment.appo_id} className="hover">
                 <td className="font-mono text-xs">{appointment.appo_id}</td>
                 <td>
@@ -164,6 +264,19 @@ export const AppointmentList = ({ appointments, loading, error, onPatientClick }
           </tbody>
         </table>
       </div>
+
+      {/* Botón Mostrar más */}
+      {hasMoreToShow && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() => setVisibleCount(prev => prev + 20)}
+            className="btn btn-outline btn-primary gap-2"
+          >
+            Mostrar más
+            <span className="badge badge-sm">{remainingCount} restantes</span>
+          </button>
+        </div>
+      )}
 
       {appointments.length === 0 && (
         <div className="text-center py-8">
