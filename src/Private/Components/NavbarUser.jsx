@@ -1,1 +1,0 @@
-//NavBar del paciente.
