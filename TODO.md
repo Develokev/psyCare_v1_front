@@ -38,7 +38,7 @@
 - [x] Reducir tamaño de AppointmentFilters para optimizar espacio en pantalla
 - [ ] Implementar notificaciones al usuario cuando cambia estado de cita
 
-## Funcionalidades Futuras - Ficha de Paciente
+## Panel de Administración - Gestión de Pacientes
 
 - [x] Crear estructura de componentes Patient
 - [x] Crear PatientProfile (container)
@@ -49,10 +49,81 @@
 - [x] Integrar navegación en HomeAdmin
 - [x] Añadir botón de edición en PatientAppointmentList (reutilizar AppointmentModal)
 - [x] Implementar filtros independientes en ficha de paciente
-- [ ] Implementar edición de datos de paciente desde panel admin
+- [ ] Crear vista/componente "Todos los Pacientes" (tabla con lista completa)
+- [ ] Implementar filtros y búsqueda en lista de pacientes
+- [ ] Implementar edición de datos de paciente (desde ficha o desde lista)
 - [ ] Añadir sección de notas clínicas por sesión
 - [ ] Implementar historial de pagos
 - [ ] Añadir tabs para organizar información (Info General, Citas, Notas, Pagos)
+
+## Panel de Usuario (Pacientes)
+
+### Diseño y Personalización
+
+- [x] Crear tema DaisyUI "userPanel" con paleta retro-playa (#5c98b2, #79c3c0, #98e1d0, #fce1ba, #f98b8b)
+- [x] Configurar tema en tailwind.config.js
+- [x] Aplicar data-theme="userPanel" en HomeUser
+- [x] Configurar fuentes Google (Inter + Poppins) en index.html
+- [x] Crear estructura visual con gradientes y colores sólidos
+- [x] Implementar bordes dobles (negro exterior + color interior) para cards
+- [x] Añadir efectos visuales (blur decorativo, shadows con tinte, gradientes)
+
+### Fase 1: Dashboard Personal (MVP)
+
+- [x] Crear estructura base de HomeUser.jsx
+- [x] Diseñar layout responsive (grid 2 columnas desktop, 1 mobile)
+- [x] Aplicar tema de colores y tipografía personalizada
+- [x] Crear placeholders visuales para todos los componentes
+- [x] Implementar filtrado básico: usuario ve solo SUS citas (por email)
+- [ ] Crear componente UserWelcome (bienvenida personalizada)
+- [ ] Adaptar UpcomingAppointments para usuario (solo sus citas)
+- [ ] Crear UserAppointmentList (lista completa de sus citas)
+- [ ] Crear UserStats (estadísticas personales: total, próximas, completadas)
+- [ ] Implementar filtrado: usuario ve solo SUS citas (por email/user_id)
+- [ ] Vista de solo lectura (sin editar ni cancelar por ahora)
+- [ ] Añadir campo `psychologist_message` y `message_read` en appointments (backend - para mensajes)
+- [ ] Crear componente RecentMessages (últimos 2-3 mensajes del psicólogo)
+- [ ] Integrar todos los componentes en HomeUser
+
+### Fase 2: Solicitud de Citas
+
+- [ ] Crear RequestAppointmentModal (formulario nueva cita)
+- [ ] Implementar calendario para seleccionar fecha
+- [ ] Crear selector de hora (slots disponibles)
+- [ ] Crear selector de tipo (online/presencial)
+- [ ] Validación: no fechas pasadas ni horarios ocupados
+- [ ] Estado inicial de cita: "pending" (requiere confirmación admin)
+- [ ] Integrar botón "Solicitar cita" en HomeUser
+
+### Fase 3: Perfil y Edición de Datos
+
+- [ ] Crear componente UserProfile (ver/editar datos personales)
+- [ ] Crear EditProfileForm (formulario de edición)
+- [ ] Permitir editar: nombre, teléfono
+- [ ] Email no editable (seguridad)
+- [ ] Opción cambiar contraseña (futuro)
+
+### Fase 4: Acciones sobre Citas
+
+- [ ] Implementar cancelación de cita (validar estado y fecha)
+- [ ] Implementar solicitud de cambio de fecha/hora
+- [ ] Ver notas de sesión compartidas por psicólogo
+
+### Fase 5: Notificaciones y Recordatorios
+
+- [ ] Sistema de notificaciones in-app
+- [ ] Recordatorios de citas próximas (24h antes)
+- [ ] Alertas de cambio de estado
+- [ ] Notificaciones de nuevos mensajes del psicólogo
+
+### Acceso a Sesiones Online
+
+- [ ] Añadir campo `meet_link` en tabla de citas (backend)
+- [ ] Crear componente MeetingAccessButton
+- [ ] Implementar lógica de habilitación (5 min antes de la cita)
+- [ ] Implementar reminder/modal automático cuando sea hora de la cita
+- [ ] Añadir validación: solo mostrar si appotype === 'online'
+- [ ] Considerar Web Notifications API para alertas del navegador
 
 ## Refactorización y Limpieza de Código
 
