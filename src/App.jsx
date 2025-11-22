@@ -1,13 +1,14 @@
-import './App.css'
+import { AppRouters } from "./Routers/AppRouters";
 
-function App() {
+
+export function App() {
   
-
   return (
     <>
-      {/* app component */}
+      <main>
+        <AppRouters />        
+      </main>
+
     </>
   )
 }
-
-export default App
