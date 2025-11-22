@@ -135,3 +135,5 @@
 - [ ] Revisar y limpiar console.logs de debugging en otros componentes
 - [ ] Sesión de refactorización general del código (imports, código duplicado, optimizaciones)
 -
+
+-
