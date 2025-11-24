@@ -52,7 +52,7 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
         {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'x-token': token,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ 
@@ -108,7 +108,7 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
         {
           method: 'PUT',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'x-token': token,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(requestBody),
@@ -151,7 +151,7 @@ export const AppointmentModal = ({ isOpen, appointment, onClose }) => {
         {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'x-token': token,
             'Content-Type': 'application/json',
           },
         }

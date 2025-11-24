@@ -13,6 +13,14 @@
 
 ## Base de Datos y Backend
 
+- [x] **CRÍTICO - Seguridad:** Incluir `id` y `email` en el payload del JWT ✅
+- [x] Respuesta del login incluye objeto `user` completo (user_id, name, last_name, email, avatar, role) ✅
+- [x] Middleware validateJWT refactorizado para usar `req.user` ✅
+- [x] Todas las rutas de appointments protegidas con validateJWT ✅
+- [x] Validación de permisos en controladores (pacientes solo ven sus citas) ✅
+- [x] Frontend actualizado: todas las peticiones usan header `x-token` ✅
+- [x] Fix loop infinito en HomeUser (dependencias useEffect) ✅
+- [x] Fix estado loading no se limpiaba (agregado finally en HomeAdmin y HomeUser) ✅
 - [ ] Añadir campo `phone` (teléfono) a la tabla de usuarios en BD
 - [ ] Hacer campo `phone` editable desde panel de usuario (no requerido en registro)
 - [ ] Verificar/añadir campo `created_at` o `registration_date` en respuesta de `/admin/users`
@@ -75,12 +83,12 @@
 - [x] Aplicar tema de colores y tipografía personalizada
 - [x] Crear placeholders visuales para todos los componentes
 - [x] Implementar filtrado básico: usuario ve solo SUS citas (por email)
-- [ ] Crear componente UserWelcome (bienvenida personalizada)
-- [ ] Adaptar UpcomingAppointments para usuario (solo sus citas)
-- [ ] Crear UserAppointmentList (lista completa de sus citas)
-- [ ] Crear UserStats (estadísticas personales: total, próximas, completadas)
-- [ ] Implementar filtrado: usuario ve solo SUS citas (por email/user_id)
-- [ ] Vista de solo lectura (sin editar ni cancelar por ahora)
+- [x] Crear componente UserStats (estadísticas personales: total, próximas, completadas)
+- [x] Integrar UserStats en HomeUser
+- [x] Implementar carga de citas filtradas por user_id desde API (segura)
+- [x] Vista de solo lectura (sin editar ni cancelar)
+- [ ] Adaptar UpcomingAppointments para usuario (widget con próximas 3 citas)
+- [ ] Crear UserAppointmentList (lista completa con sorting/paginación)
 - [ ] Añadir campo `psychologist_message` y `message_read` en appointments (backend - para mensajes)
 - [ ] Crear componente RecentMessages (últimos 2-3 mensajes del psicólogo)
 - [ ] Integrar todos los componentes en HomeUser
