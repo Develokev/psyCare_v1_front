@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setAppointments, setLoading, setError } from '../../store/slices/appointmentSlice';
 import { UserStats } from '../Components/User/UserStats';
 import { UserUpcomingAppointments } from '../Components/User/UserUpcomingAppointments';
 import { UserAppointmentList } from '../Components/User/UserAppointmentList';
+import { RequestAppointmentModal } from '../Components/User/RequestAppointmentModal';
+import { PlusCircleIcon } from '@heroicons/react/24/solid';
 
 /**
  * HomeUser - Panel principal del paciente
@@ -15,8 +17,46 @@ export const HomeUser = () => {
   const { appointments, loading, error } = useSelector(state => state.appointments);
   const { token } = useSelector(state => state.auth);
 
+  // Estado para controlar el modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Estado para mostrar mensaje cuando llega al límite
+  const [showLimitMessage, setShowLimitMessage] = useState(false);
+  // Estado para mostrar mensaje de éxito
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   // Las citas ya están filtradas por user_id desde la API
   const userAppointments = appointments;
+
+  // Calcular citas pendientes
+  const pendingAppointments = useMemo(() => {
+    return userAppointments.filter(app => app.status === 'pending');
+  }, [userAppointments]);
+
+  // Handler para solicitar nueva cita
+  const handleRequestAppointment = () => {
+    // Validar límite de 3 citas pendientes
+    if (pendingAppointments.length >= 3) {
+      setShowLimitMessage(true);
+      // Ocultar mensaje después de 5 segundos
+      setTimeout(() => setShowLimitMessage(false), 5000);
+      return;
+    }
+
+    // Abrir modal de solicitud de cita
+    setIsModalOpen(true);
+  };
+
+  // Handler para cerrar modal
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Handler para mostrar mensaje de éxito
+  const handleSuccessMessage = () => {
+    setShowSuccessMessage(true);
+    // Ocultar mensaje después de 10 segundos
+    setTimeout(() => setShowSuccessMessage(false), 10000);
+  };
 
   // Cargar SOLO las citas del usuario logueado
   useEffect(() => {
@@ -77,14 +117,56 @@ export const HomeUser = () => {
         <div className="mb-8 relative">
           <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
           <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-secondary/10 rounded-full blur-3xl"></div>
-          <div className="relative">
-            <h1 className="text-5xl font-display font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2">
-              ¡Hola, {userData?.name}! 👋
-            </h1>
-            <p className="text-lg text-gray-600 font-light">
-              Bienvenido a tu espacio personal
-            </p>
+          <div className="relative flex items-center justify-between">
+            <div>
+              <h1 className="text-5xl font-display font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-2">
+                ¡Hola, {userData?.name}! 👋
+              </h1>
+              <p className="text-lg text-gray-600 font-light">
+                Bienvenido a tu espacio personal
+              </p>
+            </div>
+            
+            {/* Botón Solicitar Cita */}
+            <button
+              onClick={handleRequestAppointment}
+              className="btn btn-primary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            >
+              <PlusCircleIcon className="w-6 h-6" />
+              Solicitar Cita
+            </button>
           </div>
+
+          {/* Mensaje de límite alcanzado */}
+          {showLimitMessage && (
+            <div className="alert alert-warning mt-4 shadow-lg animate-pulse">
+              <div>
+                <span className="text-lg">⚠️</span>
+                <div>
+                  <h3 className="font-bold">Límite de solicitudes alcanzado</h3>
+                  <div className="text-sm">
+                    Tienes {pendingAppointments.length} citas pendientes de confirmación. 
+                    Espera a que el psicólogo las revise antes de solicitar más.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mensaje de éxito */}
+          {showSuccessMessage && (
+            <div className="alert alert-success mt-4 shadow-lg animate-fade-in">
+              <div>
+                <span className="text-lg">✅</span>
+                <div>
+                  <h3 className="font-bold">¡Cita solicitada correctamente!</h3>
+                  <div className="text-sm">
+                    Tu solicitud ha sido enviada. El psicólogo la revisará pronto. Mantente atento al correo, te notificaremos cuando sea confirmada.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Grid principal */}
@@ -150,6 +232,13 @@ export const HomeUser = () => {
             </div>
           </div>
         </div>
+
+        {/* Modal de solicitud de cita */}
+        <RequestAppointmentModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onSuccess={handleSuccessMessage}
+        />
       </div>
     </div>
   );

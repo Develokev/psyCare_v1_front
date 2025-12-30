@@ -42,4 +42,18 @@ module.exports = {
     prefix: "",
     logs: true,
   },
+  // Customizaciones globales de componentes DaisyUI
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        display: ["Poppins", "Inter", "sans-serif"],
+      },
+      boxShadow: {
+        "soft-primary": "0 4px 20px -2px rgba(92, 152, 178, 0.15)",
+        "soft-secondary": "0 4px 20px -2px rgba(121, 195, 192, 0.15)",
+        "soft-accent": "0 4px 20px -2px rgba(152, 225, 208, 0.15)",
+      },
+    },
+  },
 };
