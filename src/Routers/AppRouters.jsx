@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { HomePage } from '../Public/Pages/HomePage';
 import { HomeAdmin } from '../Private/Pages/HomeAdmin';
 import { HomeUser } from '../Private/Pages/HomeUser';
+import { UserProfile } from '../Private/Components/User/UserProfile';
 
 // Componente de ruta protegida
 const PrivateRoute = ({ children, allowedRole }) => {
@@ -54,6 +55,16 @@ export const AppRouters = () => {
         element={
           <PrivateRoute allowedRole="patient">
             <HomeUser />
+          </PrivateRoute>
+        } 
+      />
+      
+      {/* Ruta de perfil de usuario */}
+      <Route 
+        path="/user/profile" 
+        element={
+          <PrivateRoute allowedRole="patient">
+            <UserProfile />
           </PrivateRoute>
         } 
       />

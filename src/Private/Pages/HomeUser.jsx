@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { setAppointments, setLoading, setError } from '../../store/slices/appointmentSlice';
 import { UserStats } from '../Components/User/UserStats';
 import { UserUpcomingAppointments } from '../Components/User/UserUpcomingAppointments';
 import { UserAppointmentList } from '../Components/User/UserAppointmentList';
 import { RequestAppointmentModal } from '../Components/User/RequestAppointmentModal';
-import { PlusCircleIcon } from '@heroicons/react/24/solid';
+import { PlusCircleIcon, UserCircleIcon } from '@heroicons/react/24/solid';
 
 /**
  * HomeUser - Panel principal del paciente
@@ -13,6 +14,8 @@ import { PlusCircleIcon } from '@heroicons/react/24/solid';
  */
 export const HomeUser = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
   const { userData } = useSelector(state => state.user);
   const { appointments, loading, error } = useSelector(state => state.appointments);
   const { token } = useSelector(state => state.auth);
@@ -21,8 +24,10 @@ export const HomeUser = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // Estado para mostrar mensaje cuando llega al límite
   const [showLimitMessage, setShowLimitMessage] = useState(false);
-  // Estado para mostrar mensaje de éxito
+  // Estado para mostrar mensaje de éxito de cita
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  // Estado para mostrar mensaje de perfil actualizado
+  const [showProfileUpdatedMessage, setShowProfileUpdatedMessage] = useState(false);
 
   // Las citas ya están filtradas por user_id desde la API
   const userAppointments = appointments;
@@ -93,6 +98,16 @@ export const HomeUser = () => {
     fetchUserAppointments();
   }, [dispatch, token, userData?.user_id, appointments.length]);
 
+  // Detectar si viene desde actualización de perfil
+  useEffect(() => {
+    if (location.state?.profileUpdated) {
+      setShowProfileUpdatedMessage(true);
+      setTimeout(() => setShowProfileUpdatedMessage(false), 10000);
+      // Limpiar el estado para no mostrar el mensaje de nuevo
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen" data-theme="userPanel">
@@ -127,14 +142,26 @@ export const HomeUser = () => {
               </p>
             </div>
             
-            {/* Botón Solicitar Cita */}
-            <button
-              onClick={handleRequestAppointment}
-              className="btn btn-primary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-105"
-            >
-              <PlusCircleIcon className="w-6 h-6" />
-              Solicitar Cita
-            </button>
+            {/* Botones de acción */}
+            <div className="flex gap-3">
+              {/* Botón Ver Perfil */}
+              <button
+                onClick={() => navigate('/user/profile')}
+                className="btn btn-secondary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                <UserCircleIcon className="w-6 h-6" />
+                Mi Perfil
+              </button>
+
+              {/* Botón Solicitar Cita */}
+              <button
+                onClick={handleRequestAppointment}
+                className="btn btn-primary btn-lg gap-2 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                <PlusCircleIcon className="w-6 h-6" />
+                Solicitar Cita
+              </button>
+            </div>
           </div>
 
           {/* Mensaje de límite alcanzado */}
@@ -147,6 +174,21 @@ export const HomeUser = () => {
                   <div className="text-sm">
                     Tienes {pendingAppointments.length} citas pendientes de confirmación. 
                     Espera a que el psicólogo las revise antes de solicitar más.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Mensaje de perfil actualizado */}
+          {showProfileUpdatedMessage && (
+            <div className="alert alert-success mt-4 shadow-lg">
+              <div>
+                <span className="text-lg">✅</span>
+                <div>
+                  <h3 className="font-bold">¡Perfil actualizado!</h3>
+                  <div className="text-sm">
+                    Tus datos se han guardado correctamente.
                   </div>
                 </div>
               </div>

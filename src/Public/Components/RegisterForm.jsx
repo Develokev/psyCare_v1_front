@@ -52,21 +52,26 @@ export const RegisterForm = () => {
         throw new Error('Registro exitoso pero hubo un problema con el login automático');
       }
 
-      // Decodificar el JWT para obtener la información del usuario
-      const tokenData = JSON.parse(atob(loginResult.token.split('.')[1]));
+      // El backend devuelve el usuario completo
+      const { token, user } = loginResult;
 
       // Guardamos en Redux
       dispatch(loginSuccess({
-        token: loginResult.token,
-        role: tokenData.role
+        token,
+        role: user.role
       }));
       
       dispatch(setUserData({
-        name: tokenData.name,
-        role: tokenData.role
+        user_id: user.user_id,
+        name: user.name,
+        last_name: user.last_name,
+        email: user.email,
+        phone: user.phone,
+        avatar: user.avatar,
+        role: user.role
       }));
 
-      console.info('✅ Registro y login exitosos:', tokenData.name);
+      console.info('✅ Registro y login exitosos:', user.name);
       
       // Redirigimos según el rol (por defecto será 'patient')
       navigate('/user');
