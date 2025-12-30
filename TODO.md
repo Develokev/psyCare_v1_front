@@ -1,5 +1,20 @@
 # TODO - Pendientes del Proyecto
 
+## Navegación y Layout Global
+
+- [ ] Diseñar y crear NavBar/Header global
+  - [ ] Definir estructura: logo, menú de navegación, avatar de usuario, notificaciones, logout
+  - [ ] Implementar NavBar para panel de administrador (NavbarAdmin)
+  - [ ] Implementar NavBar para panel de usuario (NavbarUser)
+  - [ ] Implementar NavBar público (NavbarPublic - ya existe, revisar si necesita mejoras)
+  - [ ] Añadir navegación responsive (menú hamburguesa en mobile)
+  - [ ] Integrar en AppRouters o layout principal
+- [ ] Diseñar y crear Footer global
+  - [ ] Definir contenido: links útiles, información de contacto, redes sociales, copyright
+  - [ ] Implementar Footer reutilizable
+  - [ ] Integrar en todas las páginas (admin, user, public)
+- [x] Mejorar espaciado y padding global de botones (DaisyUI customization) ✅
+
 ## Formularios y Validación
 
 - [ ] Manejar errores de formularios de Login
@@ -94,15 +109,20 @@
 - [ ] Añadir campo `psychologist_message` y `message_read` en appointments (backend - para mensajes)
 - [ ] Crear componente RecentMessages (últimos 2-3 mensajes del psicólogo)
 
-### Fase 2: Solicitud de Citas
+### Fase 2: Solicitud de Citas ✅
 
-- [ ] Crear RequestAppointmentModal (formulario nueva cita)
-- [ ] Implementar calendario para seleccionar fecha
-- [ ] Crear selector de hora (slots disponibles)
-- [ ] Crear selector de tipo (online/presencial)
-- [ ] Validación: no fechas pasadas ni horarios ocupados
-- [ ] Estado inicial de cita: "pending" (requiere confirmación admin)
-- [ ] Integrar botón "Solicitar cita" en HomeUser
+- [x] Crear RequestAppointmentModal (formulario nueva cita)
+- [x] Implementar calendario para seleccionar fecha
+- [x] Crear selector de hora (slots disponibles)
+- [x] Crear selector de tipo (online/presencial)
+- [x] Validación: no fechas pasadas ni horarios ocupados
+- [x] Estado inicial de cita: "pending" (requiere confirmación admin)
+- [x] Integrar botón "Solicitar cita" en HomeUser
+- [x] Crear hook useAvailableSlots para chequeo de disponibilidad en tiempo real
+- [x] Implementar límite de 3 citas pendientes simultáneas (anti-spam)
+- [x] Mensaje de éxito personalizado (sin alert del navegador)
+- [x] Integración completa con Redux (addAppointment)
+- [x] Theming dinámico por tipo de cita (online=turquoise, presencial=blue)
 
 ### Fase 3: Perfil y Edición de Datos
 

@@ -17,6 +17,13 @@ export const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar que los campos tengan datos antes de procesar
+    if (!form.email || !form.password) {
+      console.warn('⚠️ Formulario incompleto, submit ignorado');
+      return;
+    }
+
     dispatch(setLoading(true));
     dispatch(setError(null));
 
@@ -85,6 +92,7 @@ export const LoginForm = () => {
     <div className="flex items-center justify-center h-screen bg-gray-100">
       <form
         onSubmit={handleSubmit}
+        autoComplete="off"
         className="bg-white p-6 rounded-2xl shadow-md w-full max-w-sm"
       >
         <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
@@ -94,10 +102,10 @@ export const LoginForm = () => {
           <input
             type="email"
             className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            //value={email}
             onChange={ handleChange }
             required
-            name = "email"
+            name="email"
+            autoComplete="email"
           />
         </div>
 
@@ -106,10 +114,10 @@ export const LoginForm = () => {
           <input
             type="password"
             className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            //value={password}
             onChange={handleChange}
             required
-            name= "password"
+            name="password"
+            autoComplete="current-password"
           />
         </div>
 
