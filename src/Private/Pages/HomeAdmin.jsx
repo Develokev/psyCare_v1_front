@@ -39,7 +39,7 @@ export const HomeAdmin = () => {
         const appointmentsResponse = await fetch('https://psycare-db.onrender.com/admin/appo', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'x-token': token,
             'Content-Type': 'application/json'
           }
         });
@@ -57,7 +57,7 @@ export const HomeAdmin = () => {
         const usersResponse = await fetch('https://psycare-db.onrender.com/admin/users', {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            'x-token': token,
             'Content-Type': 'application/json'
           }
         });
@@ -83,6 +83,8 @@ export const HomeAdmin = () => {
       } catch (err) {
         console.error('❌ Error:', err.message);
         dispatch(setError(err.message));
+      } finally {
+        dispatch(setLoading(false));
       }
     };
 

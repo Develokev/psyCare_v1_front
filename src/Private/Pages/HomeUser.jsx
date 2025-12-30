@@ -1,18 +1,57 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { setAppointments, setLoading, setError } from '../../store/slices/appointmentSlice';
+import { UserStats } from '../Components/User/UserStats';
+import { UserUpcomingAppointments } from '../Components/User/UserUpcomingAppointments';
+import { UserAppointmentList } from '../Components/User/UserAppointmentList';
 
 /**
  * HomeUser - Panel principal del paciente
  * Aplicamos tema "userPanel" con paleta retro-playa
  */
 export const HomeUser = () => {
+  const dispatch = useDispatch();
   const { userData } = useSelector(state => state.user);
   const { appointments, loading, error } = useSelector(state => state.appointments);
+  const { token } = useSelector(state => state.auth);
 
-  // Filtrar solo las citas del usuario actual
-  const userAppointments = appointments.filter(
-    appo => appo.email === userData?.email
-  );
+  // Las citas ya están filtradas por user_id desde la API
+  const userAppointments = appointments;
+
+  // Cargar SOLO las citas del usuario logueado
+  useEffect(() => {
+    const fetchUserAppointments = async () => {
+      // Solo cargar si tenemos user_id y no hay citas cargadas
+      if (userData?.user_id && appointments.length === 0) {
+        dispatch(setLoading(true));
+        try {
+          const response = await fetch(`https://psycare-db.onrender.com/admin/appo/${userData.user_id}`, {
+            method: 'GET',
+            headers: {
+              'x-token': token,
+              'Content-Type': 'application/json'
+            }
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Error al cargar tus citas');
+          }
+
+          // El endpoint devuelve un array de citas del usuario
+          dispatch(setAppointments(data.data || []));
+        } catch (err) {
+          console.error('Error al cargar citas:', err.message);
+          dispatch(setError(err.message));
+        } finally {
+          dispatch(setLoading(false));
+        }
+      }
+    };
+
+    fetchUserAppointments();
+  }, [dispatch, token, userData?.user_id, appointments.length]);
 
   if (loading) {
     return (
@@ -64,10 +103,8 @@ export const HomeUser = () => {
                     <p className="text-sm text-white/80">Tus siguientes sesiones programadas</p>
                   </div>
                 </div>
-                {/* Placeholder */}
-                <div className="bg-white/90 backdrop-blur rounded-lg p-6 text-center text-gray-500">
-                  Componente UpcomingAppointments próximamente
-                </div>
+                {/* Widget de próximas 3 citas */}
+                <UserUpcomingAppointments appointments={userAppointments} />
               </div>
             </div>
 
@@ -85,44 +122,16 @@ export const HomeUser = () => {
                     </p>
                   </div>
                 </div>
-                {/* Placeholder */}
-                <div className="bg-base-200/50 rounded-lg p-6 text-center text-gray-400">
-                  Componente UserAppointmentList próximamente
-                </div>
+                {/* Lista completa de citas */}
+                <UserAppointmentList appointments={userAppointments} />
               </div>
             </div>
           </div>
 
           {/* Columna derecha: Stats y Mensajes */}
           <div className="space-y-6">
-            {/* Estadísticas con fondos de color */}
-            <div className="card bg-white shadow-soft-secondary border-l-4 border-secondary" style={{ boxShadow: '-5px 0 0 0 black, 0 4px 20px -2px rgba(121, 195, 192, 0.15)' }}>
-              <div className="card-body">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="p-2 bg-secondary/10 rounded-lg">
-                    <span className="text-2xl">📊</span>
-                  </div>
-                  <h2 className="card-title text-secondary font-display">Resumen</h2>
-                </div>
-                {/* Placeholder */}
-                <div className="space-y-3">
-                  <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-4 border-l-4 border-primary">
-                    <div className="text-xs text-gray-600 font-medium mb-1">Total de citas</div>
-                    <div className="text-3xl font-bold text-primary">
-                      {userAppointments.length}
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-accent/20 to-accent/5 rounded-xl p-4 border-l-4 border-accent">
-                    <div className="text-xs text-gray-600 font-medium mb-1">Próximas</div>
-                    <div className="text-3xl font-bold text-accent">0</div>
-                  </div>
-                  <div className="bg-gradient-to-br from-secondary/10 to-secondary/5 rounded-xl p-4 border-l-4 border-secondary">
-                    <div className="text-xs text-gray-600 font-medium mb-1">Completadas</div>
-                    <div className="text-3xl font-bold text-secondary">0</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Estadísticas */}
+            <UserStats appointments={userAppointments} />
 
             {/* Mensajes recientes con degradado */}
             <div className="card bg-gradient-to-br from-accent/20 via-accent/10 to-white shadow-soft-accent border-t-4 border-accent" style={{ boxShadow: '0 -5px 0 0 black, 0 4px 20px -2px rgba(152, 225, 208, 0.15)' }}>

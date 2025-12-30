@@ -38,25 +38,30 @@ export const LoginForm = () => {
         throw new Error(errorMessage);
       }
 
-      // Decodificar el JWT para obtener el rol
-      const tokenData = JSON.parse(atob(result.token.split('.')[1]));
+      // ✅ El backend ahora devuelve los datos completos del usuario
+      const { token, user } = result;
 
-      // Guardamos en Redux
+      // Guardamos en Redux (token y role)
       dispatch(loginSuccess({
-        token: result.token,
-        role: tokenData.role
+        token,
+        role: user.role
       }));
-      
+
+      // Guardamos todos los datos del usuario (vienen del backend)
       dispatch(setUserData({
-        name: tokenData.name,
-        role: tokenData.role
+        user_id: user.user_id,
+        name: user.name,
+        last_name: user.last_name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role
       }));
       
       // Desarrollo: Confirma login exitoso
-      console.info('✅ Login exitoso:', tokenData.name);
+      console.info('✅ Login exitoso:', user.name);
       
       // Redirigimos según el rol
-      navigate(tokenData.role === 'admin' ? '/admin' : '/user');
+      navigate(user.role === 'admin' ? '/admin' : '/user');
     } catch (error) {
       // Manejo estructurado de errores
       let errorMessage = 'Error en Login process';
