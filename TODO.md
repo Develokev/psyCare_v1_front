@@ -82,16 +82,17 @@
 - [x] Diseñar layout responsive (grid 2 columnas desktop, 1 mobile)
 - [x] Aplicar tema de colores y tipografía personalizada
 - [x] Crear placeholders visuales para todos los componentes
-- [x] Implementar filtrado básico: usuario ve solo SUS citas (por email)
-- [x] Crear componente UserStats (estadísticas personales: total, próximas, completadas)
-- [x] Integrar UserStats en HomeUser
 - [x] Implementar carga de citas filtradas por user_id desde API (segura)
 - [x] Vista de solo lectura (sin editar ni cancelar)
-- [ ] Adaptar UpcomingAppointments para usuario (widget con próximas 3 citas)
-- [ ] Crear UserAppointmentList (lista completa con sorting/paginación)
+- [x] Crear componente UserStats (estadísticas personales: total, próximas, completadas, canceladas)
+- [x] Integrar UserStats en HomeUser
+- [x] Crear UserUpcomingAppointments (widget con próximas 3 citas)
+- [x] Integrar UserUpcomingAppointments en HomeUser
+- [x] Crear UserAppointmentList (lista completa con toggle "Próximas" | "Historial")
+- [x] Implementar paginación "Mostrar más" (20 citas por página)
+- [x] Integrar UserAppointmentList en HomeUser
 - [ ] Añadir campo `psychologist_message` y `message_read` en appointments (backend - para mensajes)
 - [ ] Crear componente RecentMessages (últimos 2-3 mensajes del psicólogo)
-- [ ] Integrar todos los componentes en HomeUser
 
 ### Fase 2: Solicitud de Citas
 

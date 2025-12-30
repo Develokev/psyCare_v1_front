@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setAppointments, setLoading, setError } from '../../store/slices/appointmentSlice';
 import { UserStats } from '../Components/User/UserStats';
+import { UserUpcomingAppointments } from '../Components/User/UserUpcomingAppointments';
+import { UserAppointmentList } from '../Components/User/UserAppointmentList';
 
 /**
  * HomeUser - Panel principal del paciente
@@ -101,10 +103,8 @@ export const HomeUser = () => {
                     <p className="text-sm text-white/80">Tus siguientes sesiones programadas</p>
                   </div>
                 </div>
-                {/* Placeholder */}
-                <div className="bg-white/90 backdrop-blur rounded-lg p-6 text-center text-gray-500">
-                  Componente UpcomingAppointments próximamente
-                </div>
+                {/* Widget de próximas 3 citas */}
+                <UserUpcomingAppointments appointments={userAppointments} />
               </div>
             </div>
 
@@ -122,10 +122,8 @@ export const HomeUser = () => {
                     </p>
                   </div>
                 </div>
-                {/* Placeholder */}
-                <div className="bg-base-200/50 rounded-lg p-6 text-center text-gray-400">
-                  Componente UserAppointmentList próximamente
-                </div>
+                {/* Lista completa de citas */}
+                <UserAppointmentList appointments={userAppointments} />
               </div>
             </div>
           </div>
