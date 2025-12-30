@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// Restaurar userData desde localStorage si existe
+const storedUserData = localStorage.getItem("userData");
 const initialState = {
-  userData: null,
+  userData: storedUserData ? JSON.parse(storedUserData) : null,
   loading: false,
   error: null,
 };
@@ -14,9 +16,13 @@ export const userSlice = createSlice({
       state.userData = action.payload;
       state.loading = false;
       state.error = null;
+      // Persistir en localStorage
+      localStorage.setItem("userData", JSON.stringify(action.payload));
     },
     clearUserData: (state) => {
       state.userData = null;
+      // Limpiar localStorage
+      localStorage.removeItem("userData");
     },
     setUserError: (state, action) => {
       state.error = action.payload;

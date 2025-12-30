@@ -60,6 +60,7 @@ export const LoginForm = () => {
         name: user.name,
         last_name: user.last_name,
         email: user.email,
+        phone: user.phone,
         avatar: user.avatar,
         role: user.role
       }));
